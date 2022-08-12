@@ -119,7 +119,7 @@ class LintAnalyzer {
         final unit = await context.currentSession.getResolvedUnit(filePath);
         if (unit is ResolvedUnitResult) {
 
-          print('1-->${unit.content}');
+
 
           final result = _analyzeFile(
             unit,
@@ -182,6 +182,9 @@ class LintAnalyzer {
     String rootFolder, {
     String? filePath,
   }) {
+
+    print('1-->_analyzeFile filePath=$filePath rootFolder=$rootFolder config=$config content=${result.content}');
+
     if (filePath != null && _isSupported(result)) {
       final ignores = Suppression(result.content, result.lineInfo);
       final internalResult = InternalResolvedUnitResult(
@@ -192,8 +195,10 @@ class LintAnalyzer {
       );
       final relativePath = relative(filePath, from: rootFolder);
 
+      //找到所有 issues
       final issues = <Issue>[];
       if (!isExcluded(filePath, config.rulesExcludes)) {
+        print('_checkOnCodeIssues');
         issues.addAll(
           _checkOnCodeIssues(
             ignores,
@@ -204,6 +209,8 @@ class LintAnalyzer {
       }
 
       if (!isExcluded(filePath, config.metricsExcludes)) {
+        print('_checkOnAntiPatterns');
+
         final visitor = ScopeVisitor();
         internalResult.unit.visitChildren(visitor);
 
@@ -256,6 +263,7 @@ class LintAnalyzer {
     return null;
   }
 
+  //遍历 codeRules 并调用 每一个 的 check 方法，找到有问题的点
   Iterable<Issue> _checkOnCodeIssues(
     Suppression ignores,
     InternalResolvedUnitResult source,

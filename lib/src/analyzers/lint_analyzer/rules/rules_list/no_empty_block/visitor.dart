@@ -9,6 +9,8 @@ class _Visitor extends RecursiveAstVisitor<void> {
   void visitBlock(Block node) {
     super.visitBlock(node);
 
+    print('node = ${node.statements}');
+
     if (node.statements.isEmpty &&
         node.parent is! CatchClause &&
         !(node.endToken.precedingComments?.lexeme.contains('TODO') ?? false)) {
